@@ -13,8 +13,9 @@ removetmp="No"
 # Include configuration file
 if [ -f "/usr/local/etc/add-apt-key.conf" ]; then
   . "/usr/local/etc/add-apt-key.conf"
+fi
 # Include configuration file from repo if not installed
-else [ -f "./add-apt-key.conf" ];
+if [ -f "./add-apt-key.conf" ]; then
   . "./add-apt-key.conf"
 fi
 
