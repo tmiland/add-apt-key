@@ -13,6 +13,9 @@ removetmp="No"
 # Include configuration file
 if [ -f "/usr/local/etc/add-apt-key.conf" ]; then
   . "/usr/local/etc/add-apt-key.conf"
+# Include configuration file from repo if not installed
+else [ -f "./add-apt-key.conf" ];
+  . "./add-apt-key.conf"
 fi
 
 # Convert strings to lowercase
@@ -60,21 +63,21 @@ if [ "$1" = "--help" ]; then
   echo ""
   echo "Example 1: (PWD=/root)"
   echo "  sudo add-apt-key https://mariadb.org/mariadb_release_signing_key.asc /usr/local/share/keyrings/"
-  echo "Will download key in /root, convert it and store as /usr/local/share/keyrings/mariadb_release_signing_key.gpg"
+  echo "Will download key in /root, convert it and store as /usr/local/share/keyrings/mariadb_release_signing_key-archive-keyring.gpg"
   echo ""
   echo "Example 2: (PWD=/home/user)"
   echo "  sudo add-apt-key /root/mariadb_release_signing_key.asc /usr/local/share/keyrings/mariadbkey"
-  echo "Will use existing key in /root, convert it and store as /usr/local/share/keyrings/mariadbkey.gpg"
+  echo "Will use existing key in /root, convert it and store as /usr/local/share/keyrings/mariadbkey-archive-keyring.gpg"
   echo ""
   echo "Example 3: (PWD=/home/user)"
   echo "  sudo add-apt-key mariadb_release_signing_key.asc mariadbkey"
-  echo "Will use existing key in /home/user, convert it and store as /usr/share/keyrings/mariadbkey.gpg"
+  echo "Will use existing key in /home/user, convert it and store as /usr/share/keyrings/mariadbkey-archive-keyring.gpg"
   echo ""
-  echo "After installing the PGP key, it is also possible to add the key and repository to /etc/apt/sources.list"
+  echo "After installing the PGP key, it is also possible to add the key and repository to /etc/apt/sources.list.d/filename.list"
   echo "  - The choice to add this will be presented in the script as the first input option"
   echo "  - If Yes is chosen, the repository string must be pasted as the second input option"
   echo ""
-  echo "This completes the key installation by adding the corresponding repository line to /etc/apt/sources.list"
+  echo "This completes the key installation by adding the corresponding repository line to /etc/apt/sources.list.d/filename.list"
   exit 0
 fi
 
@@ -178,7 +181,7 @@ case "$2" in
     ;;
 esac
 
-[ "$verbosity" = "yes" ] && echo "Keyfile: $filename.gpg"
+[ "$verbosity" = "yes" ] && echo "Keyfile: $filename-archive-keyring.gpg"
 
 # Check tmpfile type and convert
 echo "Converting keyfile .."
@@ -217,7 +220,7 @@ fi
 
 # Move keyfile to "$keypath"
 echo "Moving keyfile to $keypath .."
-mv "$tmppath/$tmpfile.gpg" "$keypath/$filename.gpg"
+mv "$tmppath/$tmpfile.gpg" "$keypath/$filename-archive-keyring.gpg"
 
 # Remove tmpfile if removetmp="Yes"
 if [ "$removetmp" = "yes" ]; then
@@ -228,7 +231,7 @@ fi
 
 # Prompt for option to add key and repo to sources.list
 echo ""
-echo "Would you like to add the PGP key and repository to /etc/apt/sources.list? (yes/no)"
+echo "Would you like to add the PGP key and repository to /etc/apt/sources.list.d/$filename.list? (yes/no)"
 read -r answer
 echo ""
 
@@ -240,8 +243,8 @@ if [ ! "$answer" = "yes" ]
 then
   [ ! "$answer" = "no" ] && echo "Invalid answer - exiting." && echo ""
   # Print message for manual repo installation
-  echo "Please finish the installation manually by adding the following line to /etc/apt/sources.list:"
-  echo "deb [signed-by=$keypath/$filename.gpg] https://sdn.domain.tdn/path/repo distribution components"
+  echo "Please finish the installation manually by adding the following line to /etc/apt/sources.list.d/$filename.list:"
+  echo "deb [signed-by=$keypath/$filename-archive-keyring.gpg] https://sdn.domain.tdn/path/repo distribution components"
 else
   # Prompt for repository string (URL distribution components)
   echo "Please paste the repository string (URL distribution components - e.g. https://mirrors.dotsrc.org/mariadb/repo/10.6/ubuntu focal main):"
@@ -249,10 +252,10 @@ else
   echo ""
 
   # Adding the repo to "/etc/apt/sources.list"
-  echo "" >> /etc/apt/sources.list
-  echo "deb [signed-by=$keypath/$filename.gpg] $repostring" >> /etc/apt/sources.list
+  echo "" >> /etc/apt/sources.list.d/"$filename".list
+  echo "deb [signed-by=$keypath/$filename-archive-keyring.gpg] $repostring" >> /etc/apt/sources.list.d/"$filename".list
 
   # Print message for script repo installation
-  echo "The installation has now been finished by adding the following line to /etc/apt/sources.list:"
-  echo "deb [signed-by=$keypath/$filename.gpg] $repostring"
+  echo "The installation has now been finished by adding the following line to /etc/apt/sources.list.d/$filename.list:"
+  echo "deb [signed-by=$keypath/$filename-archive-keyring.gpg] $repostring"
 fi
