@@ -232,7 +232,7 @@ fi
 
 # Prompt for option to add key and repo to sources.list
 echo ""
-echo "Would you like to add the PGP key and repository to /etc/apt/sources.list.d/$filename.list? (yes/no)"
+echo " Would you like to add the PGP key and repository to /etc/apt/sources.list.d/$filename.list? (yes/no)"
 read -r answer
 echo ""
 
@@ -244,11 +244,12 @@ if [ ! "$answer" = "yes" ]
 then
   [ ! "$answer" = "no" ] && echo "Invalid answer - exiting." && echo ""
   # Print message for manual repo installation
-  echo "Please finish the installation manually by adding the following line to /etc/apt/sources.list.d/$filename.list:"
-  echo "deb [signed-by=$keypath/$filename-archive-keyring.gpg] https://sdn.domain.tdn/path/repo distribution components"
+  echo " Please finish the installation manually by adding the following line to\n /etc/apt/sources.list.d/$filename.list: "
+  echo "deb [signed-by=$keypath/$filename-archive-keyring.gpg] https://deb.debian.org/debian/ bullseye main"
+  echo " Replace <http://deb.debian.org/debian/ bullseye main> with the correct deb URL for your repo"
 else
   # Prompt for repository string (URL distribution components)
-  echo "Please paste the repository string (URL distribution components - e.g. https://mirrors.dotsrc.org/mariadb/repo/10.6/ubuntu focal main):"
+  echo " Please paste the repository string / URL distribution components - e.g:\n http://deb.debian.org/debian/ bullseye main: "
   read -r repostring
   echo ""
 
