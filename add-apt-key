@@ -199,7 +199,7 @@ case $(file "$tmppath/$tmpfile") in
     [ -f "$tmppath/temp-keyring.gpg~" ] && rm "$tmppath/temp-keyring.gpg~"
     ;;
   # Public ring (v4)
-  *'PGP/GPG key public ring (v4)'*)
+  *'OpenPGP Public Key Version 4\|PGP/GPG key public ring (v4)'*)
     cp "$tmppath/$tmpfile" "$tmppath/$tmpfile.gpg"
     ;;
   *)
